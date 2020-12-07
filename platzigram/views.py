@@ -17,16 +17,16 @@ def hello_world(request):  # pylint: disable = unused-argument
     return HttpResponse(f"Oh, hi! Current server time is {now}")
 
 
-def numbers(request):
+def sorted_numbers(request):
     """
-    View numbers
+    sorted view
     """
-    get_numbers = request.GET["numbers"]
-    get_numbers = map(int, get_numbers.split(","))
-    get_numbers = sorted(get_numbers)
+    numbers = request.GET["numbers"]
+    numbers = map(int, numbers.split(","))
+    numbers = sorted(numbers)
     data = {
         'status': 'ok',
-        'numbers': get_numbers,
+        'numbers': numbers,
         "message": "Integers sorted successfully",
 
     }
