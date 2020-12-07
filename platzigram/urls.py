@@ -16,11 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from platzigram import views
+from platzigram import views as locals_views
+from posts import views as posts_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("hello-world/", views.hello_world),
-    path("sorted/", views.sorted_numbers),
-    path("hi/<str:name>/<int:age>", views.say_hi)
+    path("hello-world/", locals_views.hello_world),
+    path("sorted/", locals_views.sorted_numbers),
+    path("hi/<str:name>/<int:age>", locals_views.say_hi),
+    path("posts/", posts_views.list_posts)
 ]
