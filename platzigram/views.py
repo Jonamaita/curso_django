@@ -32,3 +32,14 @@ def sorted_numbers(request):
     }
     response = json.dumps(data, indent=4)
     return HttpResponse(response, content_type='application/json')
+
+def say_hi(request, name, age):  # pylint: disable = unused-argument
+    """
+    view say_hi
+    """
+    if age < 12:
+        message = f"Sorry {name}, you are not allowed here"
+    else:
+        message = f"Hello {name}!, Welcome to Platzigram!"
+
+    return HttpResponse(message)
