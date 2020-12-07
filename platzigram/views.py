@@ -24,5 +24,11 @@ def numbers(request):
     get_numbers = request.GET["numbers"]
     get_numbers = map(int, get_numbers.split(","))
     get_numbers = sorted(get_numbers)
-    response = json.dumps({"numbers": get_numbers}, indent=4)
-    return HttpResponse(response)
+    data = {
+        'status': 'ok',
+        'numbers': get_numbers,
+        "message": "Integers sorted successfully",
+
+    }
+    response = json.dumps(data, indent=4)
+    return HttpResponse(response, content_type='application/json')
