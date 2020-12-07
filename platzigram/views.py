@@ -9,7 +9,7 @@ from datetime import datetime
 from django.http import HttpResponse
 
 
-def hello_world(request):
+def hello_world(request):  # pylint: disable = unused-argument
     """
     View hello world
     """
