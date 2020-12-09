@@ -5,16 +5,18 @@ User admin classes.
 from django.contrib import admin
 # Importamos UserAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-
 from django.contrib.auth.models import User
+
 from users.models import Profile
 
-#Por convencion la clase que creemos debe terminar en Admin.
+
+# Por convencion la clase que creemos debe terminar en Admin.
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     """
     Profile admin.
     """
+
     # Con list_display nombramos los campos que queremos visualizar.
     list_display = ("pk", "user", "phone_number", "website", "picture")
 
@@ -28,7 +30,7 @@ class ProfileAdmin(admin.ModelAdmin):
     # Para crear un buscador hacemos uso de search_fields. Los campos que se
     # ingresan seran los que el buscador recorrera para realizar las busquedas.
     search_fields = (
-        "user__email", # Se coloca doble underscore cuando es una relación.
+        "user__email",  # Se coloca doble underscore cuando es una relación.
         "user__username",
         "user__first_name",
         "user__last_name",
@@ -38,7 +40,7 @@ class ProfileAdmin(admin.ModelAdmin):
     # Podemos crear un filtro para nuestro dashboard del modelo, para ello
     # usamos list_filter, y definimos los campos con los que trabajara.
     list_filter = (
-        "user__is_active", # Se coloca doble underscore cuando es una relación.
+        "user__is_active",  # doble underscore cuando es una relación.
         "user__is_staff",
         "created",
         "modified",
@@ -48,36 +50,36 @@ class ProfileAdmin(admin.ModelAdmin):
     # este en tuplas.
     fieldsets = (
         (
-            "Profile", { # Nombre de la sección o titulo
-                "fields": ( # Los campos que visualizaremos.
-
-                        # Cuando declaramos varios campos en la misma tupla
-                        # se va a desplegar los datos en la misma fila.
-                        ("user", "picture"),
-                    ),
-                }
+            "Profile",
+            {  # Nombre de la sección o titulo
+                "fields": (  # Los campos que visualizaremos.
+                    # Cuando declaramos varios campos en la misma tupla
+                    # se va a desplegar los datos en la misma fila.
+                    ("user", "picture"),
+                ),
+            },
         ),
         (
-            "Extra info", {
+            "Extra info",
+            {
                 "fields": (
-
-                        # En este caso la información se desplegara en 2 filas
-                        # ya que la tupla de fields tiene 2 tuplas.
-                        ("website", "phone_number"),
-                        ("biography"),
-                    ),
-            }
+                    # En este caso la información se desplegara en 2 filas
+                    # ya que la tupla de fields tiene 2 tuplas.
+                    ("website", "phone_number"),
+                    ("biography"),
+                ),
+            },
         ),
         (
-            "Meta data", {
+            "Meta data",
+            {
                 "fields": (
                     # Estos datos no se pueden modificar, ya que, en el modelo
                     # se declaro que no son editables, por lo que haremos uso
                     # de readonly_fields.
                     ("created", "modified"),
                 )
-            }
-
+            },
         ),
     )
     # Aqui declararemos los campos que solo pueden ser leidos pero no
@@ -96,22 +98,26 @@ class ProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = "profiles"
 
+
 # Luego para asociar los modelos e insertarlo en el Dashboard usaremos
 # el UserAdmin de Django el cual le dimos el alias de BaseUserAdmin.
+
+
 class UserAdmin(BaseUserAdmin):
     """
     Add Profile admin to base user admin.
     """
 
     inlines = (ProfileInline,)
-    list_display = ( # En list_display
-    "username",
-    "email",
-    "first_name",
-    "last_name",
-    "is_active",
-    "is_staff",
-  )
+    list_display = (  # En list_display
+        "username",
+        "email",
+        "first_name",
+        "last_name",
+        "is_active",
+        "is_staff",
+    )
+
 
 # Re-register UserAdmin
 admin.site.unregister(User)
