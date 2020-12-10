@@ -16,13 +16,57 @@ from django.shortcuts import redirect, render
 
 from users.models import Profile
 
+# Forms
+# Importamos el ProfileForm que creamos anteriormente
+from users.forms import ProfileForm
+
 
 @login_required
 def update_profile(request):
     """
     Update a user's profile view
     """
-    return render(request, 'users/update_profile.html')
+    # Crearemos una variable que guardara el profile
+    # que esta realizando el request.
+    profile = request.user.profile
+
+    # Si el request es de tipo 'POST'
+    if request.method == 'POST':
+
+        # Crearemos una instancia de ProfileForm
+        # con los datos que recibimos a traves de request
+        form = ProfileForm(request.POST, request.FILES)
+
+        # Si la instacia se crea sin problemas.
+        if form.is_valid():
+
+            # Guardaremos los datos recibidos en base de datos.
+            data = form.cleaned_data
+
+            profile.website = data['website']
+            profile.phone_number = data['phone_number']
+            profile.biography = data['biography']
+            if data["picture"]:
+                profile.picture = data["picture"]
+            profile.save()
+
+            # Y redireccionaremos a la pagina update_profile
+            # para reflejar los cambios.
+            return redirect('update_profile')
+    else:
+        form = ProfileForm()
+
+    return render(
+        request=request,
+        template_name='users/update_profile.html',
+
+        # Enviaremos al template los datos del usuario.
+        context={
+            'profile': profile,
+            'user': request.user,
+            'form': form,
+        }
+    )
 
 
 def login_view(request):
