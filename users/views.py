@@ -1,8 +1,10 @@
 """
 User Views
 """
-# Importamos authenticate y login
-from django.contrib.auth import authenticate, login
+# Importamos authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
 # Redirect nos ayudara a redireccionarnos a otro path
 from django.shortcuts import redirect, render
 
@@ -36,3 +38,14 @@ def login_view(request):
         )
 
     return render(request, "users/login.html")
+
+
+# Creamos la funcion logout_view, y lo decoramos con
+# login_required, asi solo se ejecutara si existe una sesión.
+@login_required
+def logout_view(request):
+    """
+    logout view
+    """
+    logout(request) # Ejecutamos logout, el cual borrara los tokens del navegador.
+    return redirect('login') # Redirigimos a path de login.
