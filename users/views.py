@@ -17,6 +17,7 @@ from django.shortcuts import redirect, render
 from users.models import Profile
 
 
+@login_required
 def update_profile(request):
     """
     Update a user's profile view
