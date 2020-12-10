@@ -43,4 +43,4 @@ def list_posts(request):  # pylint: disable = unused-argument
     """
     View to lists posts
     """
-    return render(request, "feed.html", {"posts": posts})
+    return render(request, "posts/feed.html", {"posts": posts})
