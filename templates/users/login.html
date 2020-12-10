@@ -10,18 +10,23 @@
 <!-- Como anteriormente le dimos un alias al path 'users/login/' ahora lo invocaremos como 'login'. -->
 <form method="POST" action="{% url 'login' %}">
 
-  <!-- En caso de que estemos recibiendo la variable 'error' en el renderizado lo mostraremos. -->
-  {% if error %}
-    <p style="color: red;">{{ error }}</p>
-  {% endif %}
+    <!-- En caso de que estemos recibiendo la variable 'error' en el renderizado lo mostraremos. -->
+    {% if error %}
+    <p class="alert alert-danger">{{ error }}</p>
+    {% endif %}
 
-  <!-- csrf_token es un metodo de Django para evitar ataques CSRF. Te lo explico mejor abajo. -->
-  {% csrf_token %}
+    <!-- csrf_token es un metodo de Django para evitar ataques CSRF. Te lo explico mejor abajo. -->
+    {% csrf_token %}
+    
+    <div class="form-group">
+    <input class="form-control" type="text" placeholder="Username" name="username" />
+    </div>
 
-  <input type="text" placeholder="Username" name="username" />
-  <input type="password" placeholder="Password" name="password" />
+    <div class="form-group">
+    <input class="form-control" type="password" placeholder="Password" name="password" />
+    </div>
 
-  <button type="submit">Sign in!</button>
+    <button class="btn btn-primary btn-block mt-5" type="submit">Sign in!</button>
 
 </form>
 
