@@ -28,6 +28,8 @@ urlpatterns = [
     path("sorted/", locals_views.sorted_numbers, name="sort"),
     path("hi/<str:name>/<int:age>", locals_views.say_hi, name="hi"),
     path("posts/", posts_views.list_posts, name="feed"),
-    path("users/login", users_views.login_view, name="login")
+    path("users/login", users_views.login_view, name="login"),
+    path("users/logout", users_views.logout_view, name="logout"),
+
     # concatenamos static con los valores definidos en settings.py
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
