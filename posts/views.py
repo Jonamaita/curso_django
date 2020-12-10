@@ -4,6 +4,7 @@ Posts Views
 
 from datetime import datetime
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 # Create your views here.
@@ -39,6 +40,7 @@ posts = [
 ]
 
 
+@login_required
 def list_posts(request):  # pylint: disable = unused-argument
     """
     View to lists posts
