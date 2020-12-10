@@ -24,7 +24,7 @@ class ProfileCompletionMiddleware:
     # Dentro de __call__ es donde realizaremos nuestras validaciones.
     def __call__(self, request):
         # En caso de que el usuario no sea anonimo.
-        if not request.user.is_anonymous:
+        if not request.user.is_anonymous and not request.user.is_staff:
             profile = request.user.profile
 
             # Verificamos que la instacia de user tenga una foto o biografía.
