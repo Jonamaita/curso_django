@@ -8,7 +8,7 @@
 {% block container %}
 
 <!-- Como anteriormente le dimos un alias al path 'users/login/' ahora lo invocaremos como 'login'. -->
-<form method="POST" action="{% url 'login' %}">
+<form method="POST" action="{% url 'users:login' %}">
 
     <!-- En caso de que estemos recibiendo la variable 'error' en el renderizado lo mostraremos. -->
     {% if error %}
@@ -28,7 +28,7 @@
 
     <button class="btn btn-primary btn-block mt-5" type="submit">Sign in!</button>
 
-    <p class="mt-4">Don't have an account yet? <a href="{% url "signup" %}">Sign up here.</a></p>
+    <p class="mt-4">Don't have an account yet? <a href="{% url 'users:signup' %}">Sign up here.</a></p>
 
 </form>
 
