@@ -27,12 +27,13 @@ urlpatterns = [
     path("hello-world/", locals_views.hello_world, name="hello_world"),
     path("sorted/", locals_views.sorted_numbers, name="sort"),
     path("hi/<str:name>/<int:age>", locals_views.say_hi, name="hi"),
-    path("posts/", posts_views.list_posts, name="feed"),
+    path("", posts_views.list_posts, name="feed"),
+    path("posts/new/", posts_views.create_post, name="create_post"),
     path("users/login", users_views.login_view, name="login"),
     path("users/logout", users_views.logout_view, name="logout"),
     path("users/signup", users_views.signup, name="signup"),
     path(
-        'users/me/profile', users_views.update_profile, name='update_profile'
+        "users/me/profile", users_views.update_profile, name="update_profile"
     ),
 
     # concatenamos static con los valores definidos en settings.py
