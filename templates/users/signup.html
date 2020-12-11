@@ -14,7 +14,7 @@
     {% endif %}
 
     <!-- Este sera el formulario de registro -->
-    <form actions="{% url 'signup' %}" method="POST">
+    <form actions="{% url 'users:signup' %}" method="POST">
     <!-- No olvidar que para los formularios en Django debemos hacer uso de csrf_token -->
     {% csrf_token %}
 
