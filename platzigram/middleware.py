@@ -32,11 +32,11 @@ class ProfileCompletionMiddleware:
                 # En caso de que no este en path de 'update_profile' o 'logout'
                 # Se redirige a "update_profile"
                 if request.path not in [
-                    reverse("update_profile"),
-                    reverse("logout"),
+                    reverse("users:update_profile"),
+                    reverse("users:logout"),
                 ]:
                     # Vamos a redireccionarlo al path de 'update_profile'
-                    return redirect("update_profile")
+                    return redirect("users:update_profile")
 
         # En caso de que cumple todos los requisitos devolvemos la solicitud
         # original.
