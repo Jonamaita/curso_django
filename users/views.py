@@ -44,7 +44,7 @@ def update_profile(request):
 
             # Y redireccionaremos a la pagina update_profile
             # para reflejar los cambios.
-            return redirect('update_profile')
+            return redirect('users:update_profile')
     else:
         form = ProfileForm()
 
@@ -79,7 +79,7 @@ def login_view(request):
 
             # redireccionaremos al path con alias 'feed' que es para la url
             # 'posts/'
-            return redirect("feed")
+            return redirect("posts:feed")
 
         # En caso de dar false la autenticacion volveremos a renderizar el
         # login, pero enviando la variable 'error'.
@@ -102,7 +102,7 @@ def logout_view(request):
 
     # Ejecutamos logout, el cual borrara los tokens del navegador.
     logout(request)
-    return redirect("login")  # Redirigimos a path de login.
+    return redirect("users:login")  # Redirigimos a path de login.
 
 
 def signup(request):
@@ -119,7 +119,7 @@ def signup(request):
         # y nos redirige al login.
         if form.is_valid():
             form.save()
-            return redirect('login')
+            return redirect('users:login')
     else:
         form = SignupForm()
 
