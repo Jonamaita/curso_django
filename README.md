@@ -2893,6 +2893,155 @@ Documentación:
 
 [Form and field validation | Django documentation | Django](https://docs.djangoproject.com/en/2.0/ref/forms/validation/)
 
+# Vistas basadas en clases
+
+Veamos de qué forma optimizamos el proceso de creación de nuestras apps de forma que no repitamos código. Para ver cuál es el concepto de class based views. Las vistas también pueden ser clases, que tienen el objetivo de evitar la repetición de tareas como mostrar los templates, son vistas genéricas que resuelven problemas comunes.
+
+Primero debemos modificar `urls.py` de `platzigram` (urls principales), ya que, con lo siguiente vamos ordenar las url de mejor manera, es decir, un ruta para cada aplicación, ademas a cada aplicación le vamos a crear un archivo `urls.py`, el cual, tendrá las urls de esa aplicación.
+
+```python
+# platzigram/urls.py
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import path, include
+
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("", include(("posts.urls", "posts"), namespace="posts")),
+    path("users/", include(("users.urls", "users"), namespace="users")),
+
+    # concatenamos static con los valores definidos en settings.py
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+```
+
+Ahora creamos un archivo `urls.py` para cada aplicación.
+
+```python
+# users/urls.py
+
+"""Users URLs."""
+
+# Django
+from django.urls import path
+from django.views.generic import TemplateView
+
+# View
+from users import views
+
+
+urlpatterns = [
+
+    # Posts
+    path(
+        route='profile/<str:username>/',
+        view=TemplateView.as_view(template_name='users/detail.html'),
+        name='detail'
+    ),
+
+    # Management
+    path(
+        route='login/',
+        view=views.login_view,
+        name='login'
+    ),
+    path(
+        route='logout/',
+        view=views.logout_view,
+        name='logout'
+    ),
+    path(
+        route='signup/',
+        view=views.signup,
+        name='signup'
+    ),
+    path(
+        route='me/profile/',
+        view=views.update_profile,
+        name='update_profile'
+    )
+
+]
+
+```
+
+```python
+# posts/urls.py
+
+"""Posts URLs."""
+
+# Django
+from django.urls import path
+
+# Views
+from posts import views
+
+urlpatterns = [
+
+    path(
+        route='',
+        view=views.list_posts,
+        name='feed'
+    ),
+
+    path(
+        route='posts/new/',
+        view=views.create_post,
+        name='create'
+    ),
+]
+```
+
+habiendo ordenado las `urls` por cada aplicación, debemos modificar varios archivos, ya que, cuando hagamos referencia a la **url** en la vista o en el html debemos referenciarlo de la siguiente manera:
+
+`<nombre_app>:<nombre_url>` 
+
+Ejemplo:
+
+`user:login`
+
+Esto se debe hacer en todos lo archivos en donde hacemos referencia a las **urls**, en el siguiente ejemplo podemos ver como refereciamos la url en la vista `login_view`, al redireccionar a la url `posts:feed`.
+
+```python
+def login_view(request):
+    """
+    login view
+    """
+
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        # El metodo authenticate tratara de contrastar el usuario con una
+        # instancia del modelo users que creamos.
+        user = authenticate(request, username=username, password=password)
+        if user:
+            # En caso de ser exitoso la autenticación creara un token de
+            # nuestro usuario para almacenarlo en memoria.
+            login(request, user)
+
+            # redireccionaremos al path con alias 'feed' que es para la url
+            # 'posts/'
+            return redirect("posts:feed")
+
+        # En caso de dar false la autenticacion volveremos a renderizar el
+        # login, pero enviando la variable 'error'.
+        return render(
+            request,
+            "users/login.html",
+            {"error": "Invalid username and password"},
+        )
+
+    return render(request, "users/login.html")
+```
+
+Los otros documentos modificados estarán en el repositorio.
+
+Documentación:
+
+En el siguiente link nos podemos guiar para las vistas basadas en clases http://ccbv.co.uk/.
+
 # Glosario
 
 - **ORM**: Object-relational mapping. Es el encargado de permitir
