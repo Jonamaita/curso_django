@@ -2751,67 +2751,95 @@ Ahora debemos  modificar el template `feed.html`.
 
 ## Validación de formulario en el Model Form
 
-Hasta ahora hemos estado validando los datos a traves de la renderizacion de las vistas, sin embargo podemos validar directamente sobre los formularios los datos, simplificando la sintaxis de nuestro codigo y haciendolo mas legible.
+Hasta ahora hemos estado validando los datos a través en las vistas y eventualmente el código puede convertirse en un caos, sin embargo, podemos validar directamente sobre los formularios los datos, simplificando la sintaxis de nuestro código y haciéndolo mas legible.
 
 Para ello primero crearemos un archivo **forms.py** en nuestra aplicación _users_.
 
 ```python
-# Archivo users/forms.py
-# Django
-# Django tiene una clase forms del cual podemos crear nuestros formularios.
+# users/forms.py
+"""
+Users forms
+"""
 from django import forms
 
 # Models
-# Importaremos los modelos que crearemos a traves
-# de nuestro formulario.
 from django.contrib.auth.models import User
 from users.models import Profile
 
+
 class SignupForm(forms.Form):
+    """
+    Signup Form
+    """
 
-  # Definimos los campos.
-  username = forms.CharField(min_length=4, max_length=50)
+    # Definimos los campos.
+    username = forms.CharField(min_length=4, max_length=50)
 
-  password = forms.CharField(max_length=70, widget=forms.PasswordInput())
-  password_confirmation = forms.CharField(max_length=70, widget=forms.PasswordInput())
+    password = forms.CharField(max_length=70, widget=forms.PasswordInput())
+    password_confirmation = forms.CharField(
+        max_length=70,
+        widget=forms.PasswordInput(),
+    )
 
-  first_name = forms.CharField(min_length=2, max_length=50)
-  last_name = forms.CharField(min_length=2, max_length=50)
+    first_name = forms.CharField(min_length=2, max_length=50)
+    last_name = forms.CharField(min_length=2, max_length=50)
 
-  email = forms.CharField(min_length=6, max_length=70, widget=forms.EmailInput())
+    email = forms.CharField(
+        min_length=6,
+        max_length=70,
+        widget=forms.EmailInput(),
+    )
 
-  # verificamos que el username no exista.
-  def clean_username(self):
-    username = self.cleaned_data['username']
-    username_taken = User.objects.filter(username=username).exists()
-    if username_taken:
-      # En caso de existir devolvemos un mensaje de error.
-      raise forms.ValidationError('Username is already in use.')
-    
-    return username
+    # verificamos que el username no exista. El nombre de la clase debe ser
+    # clean_<field>, en este caso el field es username
+    def clean_username(self):
+        """Username must be unique."""
+        username = self.cleaned_data['username']
+        username_taken = User.objects.filter(username=username).exists()
+        if username_taken:
+            #  En caso de existir devolvemos un mensaje de error al html.
+            raise forms.ValidationError('Username is already in use.')
+        # Siempre debemos retornar el campo
+        return username
 
-  def clean(self):
-    data = super().clean()
+    # Sobreescribimos el método clean
+    def clean(self):
+        # Llamamos el método .clean de la clase padre
+        data = super().clean()
 
-    password = data['password']
-    password_confirmation = data['password_confirmation']
+        password = data['password']
+        password_confirmation = data['password_confirmation']
 
-    # Verificamos que las constraseñas coincidan.
-    if password != password_confirmation:
-      # En caso de ser distintas devolvemos un mensaje de error.
-      raise forms.ValidationError('Passwords do not match.')
+        # Verificamos que las constraseñas coincidan.
+        if password != password_confirmation:
+            # En caso de ser distintas devolvemos un mensaje de error al html.
+            raise forms.ValidationError('Passwords do not match.')
 
-    return data
+        # siempre debemos retornar el data
+        return data
 
-  # Creamos una instancia de User y Profile.
-  def save(self):
-    data = self.cleaned_data
-    data.pop('password_confirmation')
+    # Creamos una instancia de User y Profile.
+    def save(self):
+        """
+        save method.
+        """
+        data = self.cleaned_data
+        data.pop('password_confirmation')
 
-    user = User.objects.create_user(**data)
-    profile = Profile(user=user)
-    profile.save()
+        # creamos el objeto user
+        user = User.objects.create_user(**data)
+        profile = Profile(user=user)
+        profile.save()
 
+
+class ProfileForm(forms.Form):
+    """
+    Update profile form
+    """
+    website = forms.URLField(max_length=200, required=True)
+    biography = forms.CharField(max_length=500, required=False)
+    phone_number = forms.CharField(max_length=20, required=False)
+    picture = forms.ImageField(required=False)
 ```
 
 Ya que tenemos nuestro formulario creado lo aplicaremos en la vista de **signup** de la aplicación _users_.
@@ -2827,7 +2855,6 @@ from django.shortcuts import render, redirect
 # Importamos nuestro formulario
 from users.forms import SignupForm
 
-...
 
 def signup(request):
   if request.method == 'POST':
@@ -2855,6 +2882,16 @@ def signup(request):
 ```
 
 Con esta metodología hacemos uso de las herramientas de Django para crear formularios, facilitando el desarrollo y sintaxis de nuestro proyecto.
+
+
+
+Documentación:
+
+[Widgets | Django documentation | Django](https://docs.djangoproject.com/en/2.0/ref/forms/widgets/)
+
+[Form fields | Django documentation | Django](https://docs.djangoproject.com/en/2.0/ref/forms/fields/)
+
+[Form and field validation | Django documentation | Django](https://docs.djangoproject.com/en/2.0/ref/forms/validation/)
 
 # Glosario
 
