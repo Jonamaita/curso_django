@@ -34,7 +34,7 @@ def create_post(request):
             form.instance.user = request.user
             form.instance.profile = request.user.profile
             form.save()
-            return redirect('feed')
+            return redirect('posts:feed')
 
     else:
         form = PostForm()
