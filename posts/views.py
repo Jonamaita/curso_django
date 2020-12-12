@@ -5,7 +5,7 @@ Posts Views
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 # Models
 from posts.models import Post
@@ -29,6 +29,14 @@ class PostsFeedView(LoginRequiredMixin, ListView):
     paginate_by = 30
     # Enviamos el objeto al html como posts
     context_object_name = 'posts'
+
+
+class PostDetailView(LoginRequiredMixin, DetailView):
+    """Return post detail."""
+
+    template_name = 'posts/detail.html'
+    queryset = Post.objects.all()
+    context_object_name = 'post'
 
 
 @login_required
