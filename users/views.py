@@ -57,59 +57,6 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-@login_required
-def update_profile(request):
-    """
-    Update a user's profile view
-    """
-    # Crearemos una variable que guardara el profile
-    # que esta realizando el request.
-    profile = request.user.profile
-
-    # Si el request es de tipo 'POST'
-    if request.method == "POST":
-
-        # Crearemos una instancia de ProfileForm
-        # con los datos que recibimos a traves de request
-        form = ProfileForm(request.POST, request.FILES)
-
-        # Si la instacia se crea sin problemas.
-        if form.is_valid():
-
-            # Guardaremos los datos recibidos en base de datos.
-            data = form.cleaned_data
-
-            profile.website = data["website"]
-            profile.phone_number = data["phone_number"]
-            profile.biography = data["biography"]
-            if data["picture"]:
-                profile.picture = data["picture"]
-            profile.save()
-
-            # Y redireccionaremos a la pagina update_profile para reflejar los
-            # cambios. Como detail, espera un argumento debemos usar reverse
-            # y pasarle el argumento en los kwargs
-            url = reverse(
-                'users:detail',
-                kwargs={'username': request.user.username},
-            )
-            return redirect(url)
-
-    else:
-        form = ProfileForm()
-
-    return render(
-        request=request,
-        template_name="users/update_profile.html",
-        # Enviaremos al template los datos del usuario.
-        context={
-            "profile": profile,
-            "user": request.user,
-            "form": form,
-        },
-    )
-
-
 def login_view(request):
     """
     login view
