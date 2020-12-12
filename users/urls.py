@@ -6,36 +6,32 @@ from django.urls import path
 # View
 from users import views
 
-
 urlpatterns = [
-
     # Posts
     path(
-        route='detail/<str:username>/',
+        route="detail/<str:username>/",
         view=views.UserDetailView.as_view(),
-        name='detail'
+        name="detail",
     ),
-
     # Management
     path(
-        route='login/',
+        route="login/",
         view=views.LoginView.as_view(),
-        name='login',
+        name="login",
     ),
     path(
-        route='logout/',
+        route="logout/",
         view=views.LogoutView.as_view(),
-        name='logout',
+        name="logout",
     ),
     path(
-        route='signup/',
+        route="signup/",
         view=views.SignupView.as_view(),
-        name='signup',
+        name="signup",
     ),
     path(
-        route='me/profile/',
+        route="me/profile/",
         view=views.UpdateProfileView.as_view(),
-        name='update_profile',
-    )
-
+        name="update_profile",
+    ),
 ]

@@ -2,9 +2,9 @@
 User Views
 """
 
+from django.contrib.auth import views as auth_views
 # Django
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import views as auth_views
 # Models
 from django.contrib.auth.models import User
 # Redirect nos ayudara a redireccionarnos a otro path
@@ -56,7 +56,7 @@ class UserDetailView(LoginRequiredMixin, DetailView):
 class LoginView(auth_views.LoginView):
     """Login view."""
 
-    template_name = 'users/login.html'
+    template_name = "users/login.html"
     # Si un usuario loguenado entra en login, lo redirige a la url de la
     # variable LOGIN_REDIRECT_URL definida en settings
     redirect_authenticated_user = True
@@ -86,7 +86,7 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
 class LogoutView(LoginRequiredMixin, auth_views.LogoutView):
     """Logout view."""
 
-    template_name = 'users/logged_out.html'
+    template_name = "users/logged_out.html"
 
 
 class SignupView(FormView):

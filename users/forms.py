@@ -2,9 +2,9 @@
 Users forms
 """
 from django import forms
-
 # Models
 from django.contrib.auth.models import User
+
 from users.models import Profile
 
 
@@ -35,11 +35,11 @@ class SignupForm(forms.Form):
     # clean_<field>, en este caso el field es username
     def clean_username(self):
         """Username must be unique."""
-        username = self.cleaned_data['username']
+        username = self.cleaned_data["username"]
         username_taken = User.objects.filter(username=username).exists()
         if username_taken:
             #  En caso de existir devolvemos un mensaje de error al html.
-            raise forms.ValidationError('Username is already in use.')
+            raise forms.ValidationError("Username is already in use.")
         # Siempre debemos retornar el campo
         return username
 
@@ -48,13 +48,13 @@ class SignupForm(forms.Form):
         # Llamamos el método .clean de la clase padre
         data = super().clean()
 
-        password = data['password']
-        password_confirmation = data['password_confirmation']
+        password = data["password"]
+        password_confirmation = data["password_confirmation"]
 
         # Verificamos que las constraseñas coincidan.
         if password != password_confirmation:
             # En caso de ser distintas devolvemos un mensaje de error al html.
-            raise forms.ValidationError('Passwords do not match.')
+            raise forms.ValidationError("Passwords do not match.")
 
         # siempre debemos retornar el data
         return data
@@ -65,7 +65,7 @@ class SignupForm(forms.Form):
         save method.
         """
         data = self.cleaned_data
-        data.pop('password_confirmation')
+        data.pop("password_confirmation")
 
         # creamos el objeto user
         user = User.objects.create_user(**data)
@@ -77,6 +77,7 @@ class ProfileForm(forms.Form):
     """
     Update profile form
     """
+
     website = forms.URLField(max_length=200, required=True)
     biography = forms.CharField(max_length=500, required=False)
     phone_number = forms.CharField(max_length=20, required=False)

@@ -14,4 +14,4 @@ class PostForm(forms.ModelForm):
         """Form settings."""
 
         model = Post
-        fields = ('title', 'photo')
+        fields = ("title", "photo")
