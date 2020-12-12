@@ -11,9 +11,11 @@
 <form method="POST" action="{% url 'users:login' %}">
 
     <!-- En caso de que estemos recibiendo la variable 'error' en el renderizado lo mostraremos. -->
-    {% if error %}
-    <p class="alert alert-danger">{{ error }}</p>
-    {% endif %}
+    {% if form.errors %}
+        <p class="alert alert-danger">
+            Your username and password didn't match. Please try again.
+        </p>
+    {% endif%}
 
     <!-- csrf_token es un metodo de Django para evitar ataques CSRF. Te lo explico mejor abajo. -->
     {% csrf_token %}
