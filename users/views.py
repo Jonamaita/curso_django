@@ -6,20 +6,18 @@ User Views
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse, reverse_lazy
-
 # Models
 from django.contrib.auth.models import User
-
 # Redirect nos ayudara a redireccionarnos a otro path
 from django.shortcuts import redirect, render
-from django.views.generic import DetailView, FormView
+from django.urls import reverse, reverse_lazy
+from django.views.generic import DetailView, FormView, UpdateView
 
 from posts.models import Post
-
 # Forms
 # Importamos el ProfileForm que creamos anteriormente
-from users.forms import ProfileForm, SignupForm
+from users.forms import SignupForm
+from users.models import Profile
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
@@ -101,14 +99,35 @@ def logout_view(request):
     return redirect("users:login")  # Redirigimos a path de login.
 
 
+class UpdateProfileView(LoginRequiredMixin, UpdateView):
+    """Update profile view."""
+
+    template_name = "users/update_profile.html"
+    model = Profile
+    fields = ["website", "biography", "phone_number", "picture"]
+
+    def get_object(self):
+        """Return user's profile."""
+        # Retorna el objeto profile
+        return self.request.user.profile
+
+    def get_success_url(self):
+        """Return to user's profile."""
+
+        # self.obejct es el profile que retornamos en get_object
+        username = self.object.user.username
+
+        return reverse("users:detail", kwargs={"username": username})
+
+
 class SignupView(FormView):
     """
     Signup View.
     """
 
-    template_name = 'users/signup.html'
+    template_name = "users/signup.html"
     form_class = SignupForm
-    success_url = reverse_lazy('users:login')
+    success_url = reverse_lazy("users:login")
 
     def form_valid(self, form):
         """Save form data."""
