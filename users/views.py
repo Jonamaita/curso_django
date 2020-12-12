@@ -6,14 +6,14 @@ User Views
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 # Models
 from django.contrib.auth.models import User
 
 # Redirect nos ayudara a redireccionarnos a otro path
 from django.shortcuts import redirect, render
-from django.views.generic import DetailView
+from django.views.generic import DetailView, FormView
 
 from posts.models import Post
 
@@ -154,26 +154,16 @@ def logout_view(request):
     return redirect("users:login")  # Redirigimos a path de login.
 
 
-def signup(request):
+class SignupView(FormView):
     """
-    signup view
+    Signup View.
     """
 
-    # Al recibir el metodo POST.
-    if request.method == "POST":
-        # Le enviamos los datos de request a nuestro formulario
-        form = SignupForm(request.POST)
+    template_name = 'users/signup.html'
+    form_class = SignupForm
+    success_url = reverse_lazy('users:login')
 
-        # En caso de ser valido guarda las instancias
-        # y nos redirige al login.
-        if form.is_valid():
-            form.save()
-            return redirect("users:login")
-    else:
-        form = SignupForm()
-
-    return render(
-        request=request,
-        template_name="users/signup.html",
-        context={"form": form},
-    )
+    def form_valid(self, form):
+        """Save form data."""
+        form.save()
+        return super().form_valid(form)
