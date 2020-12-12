@@ -26,7 +26,7 @@ class PostsFeedView(LoginRequiredMixin, ListView):
     # El orden
     ordering = ('-created',)
     # Paginamos
-    paginate_by = 2
+    paginate_by = 30
     # Enviamos el objeto al html como posts
     context_object_name = 'posts'
 
