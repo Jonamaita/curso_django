@@ -2936,7 +2936,7 @@ urlpatterns = [
 
     # Posts
     path(
-        route='profile/<str:username>/',
+        route='detail/<str:username>/',
         view=TemplateView.as_view(template_name='users/detail.html'),
         name='detail'
     ),
@@ -3102,6 +3102,306 @@ Nos falta el archivo `detail.html`
 Documentación:
 
 En el siguiente link nos podemos guiar para las vistas basadas en clases http://ccbv.co.uk/.
+
+## Protegiendo la vista de perfil, Detail View y List View
+
+Primeramente haremos la vista `DetalView` como vista basada en clase, ya que, la anterior era una vista un poco estática.  en `users/views.py`
+
+```python
+# users/views.py
+
+"""
+User Views
+"""
+
+# Importamos authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+# Models
+from django.contrib.auth.models import User
+
+# Redirect nos ayudara a redireccionarnos a otro path
+from django.shortcuts import redirect, render
+from django.views.generic import DetailView
+
+from posts.models import Post
+
+# Forms
+# Importamos el ProfileForm que creamos anteriormente
+from users.forms import ProfileForm, SignupForm
+
+
+class UserDetailView(LoginRequiredMixin, DetailView):
+    """User detail view."""
+
+    template_name = "users/detail.html"
+
+    # Es el campo que se la pasara a la query para buscar el usuario
+    # Podemos pasarle <email> tambien, esta vez buscamos el usuario por su
+    # username
+    slug_field = "username"
+
+    # Es la palabra clave que le pasamos al url detail/<str:username>/
+    slug_url_kwarg = "username"
+
+    queryset = User.objects.all()
+
+    # Esto es como se mandara el objeto al html
+    context_object_name = "user"
+
+    # Sobre escribimos el método get_context_data
+    def get_context_data(self, **kwargs):
+        """Add user's posts to context."""
+        context = super().get_context_data(**kwargs)
+        user = self.get_object()
+        context["posts"] = Post.objects.filter(user=user).order_by("-created")
+        return context
+
+.......
+```
+
+Podemos ver que con la clase `LoginRequiredMixin` protegemos la vista. Ahora vamos a actualizar el redireccionamiento de la vista `update_profile`, ya que, debemos pesarla un argumento a la url y para ello debemos usar `reverse`.
+
+```python
+# users/views.py
+@login_required
+def update_profile(request):
+    """
+    Update a user's profile view
+    """
+    # Crearemos una variable que guardara el profile
+    # que esta realizando el request.
+    profile = request.user.profile
+
+    # Si el request es de tipo 'POST'
+    if request.method == "POST":
+
+        # Crearemos una instancia de ProfileForm
+        # con los datos que recibimos a traves de request
+        form = ProfileForm(request.POST, request.FILES)
+
+        # Si la instacia se crea sin problemas.
+        if form.is_valid():
+
+            # Guardaremos los datos recibidos en base de datos.
+            data = form.cleaned_data
+
+            profile.website = data["website"]
+            profile.phone_number = data["phone_number"]
+            profile.biography = data["biography"]
+            if data["picture"]:
+                profile.picture = data["picture"]
+            profile.save()
+
+            # Y redireccionaremos a la pagina update_profile para reflejar los
+            # cambios. Como detail, espera un argumento debemos usar reverse
+            # y pasarle el argumento en los kwargs
+            url = reverse(
+                'users:detail',
+                kwargs={'username': request.user.username},
+            )
+            return redirect(url)
+```
+
+actualizamos el html `detail.html`, para mostrar todos los **posts** del usuario.
+
+```html
+<!--- templates/users/detail.html ---> 
+{% extends "base.html" %}
+
+{% block head_content %}
+<title>@{{ user.username }} | Platzigram</title>
+{% endblock %}
+
+{% block container %}
+
+    <div class="container mb-5" style="margin-top: 8em;">
+        <div class="row">
+
+            <div class="col-sm-4 d-flex justify-content-center">
+                <img
+                    src="{{ user.profile.picture.url }}"
+                    alt="@{{ user.username}}"
+                    class="rounded-circle"
+                    width="150px"
+                />
+            </div>
+
+            <div class="col-sm-8">
+                <h2 style="font-weight: 100;">
+                    {{ user.username }}
+                    {% if user == request.user %}
+                        <a
+                            href="{% url "users:update_profile" %}"
+                            class="ml-5 btn btn-sm btn-outline-info"
+                        >
+                            Edit profile
+                        </a>
+                    {% else %}
+                        <a
+                            href=""
+                            class="ml-5 btn btn-sm btn-primary"
+                        >
+                            Follow
+                        </a>
+                    {% endif %}
+                </h2>
+
+                <div class="row mt-2" style="font-size: 1.2em">
+                    <div class="col-sm-4">
+                        <b>{{ user.profile.posts_count }}785</b> posts
+                    </div>
+                    <div class="col-sm-4">
+                        <b>{{ user.profile.followers }}1,401</b> followers
+                    </div>
+                    <div class="col-sm-4">
+                        <b>{{ user.profile.following }}491</b> following
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-sm-12">
+                        <p>{{ user.profile.biography }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="container" id="user-posts">
+        <div class="row mt-3">
+            {% for post in posts %}
+            <div class="col-sm-4 pt-5 pb-5 pr-5 pl-5 d-flex justify-content-center align-items-center">
+                <a href="" class="border">
+                    <img src="{{ post.photo.url }}" alt="{{ post.title }}" class="img-fluid"/>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}	
+```
+
+Modificamos el `nav.html`, para que hagamos click en la foto nos lleve al detalle del perfil.
+
+```html
+<!-- templates/users/detail.html --->
+<!-- Cargamos las refenrencias a los dir static -->
+{% load static %}
+<nav class="navbar navbar-expand-lg fixed-top" id="main-navbar">
+  <div class="container">
+
+    <a class="navbar-brand pr-5" style="border-right: 1px solid #efefef;" href="{% url "posts:feed" %}"/>
+      <!-- Vamos a referenciar a la imagen de instagram en statics -->
+      <img src="{% static 'img/instagram.png' %}" height="45" class="d-inline-block align-top"/>
+    </a>
+
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+
+          <li class="nav-item">
+            <a href="{% url 'users:detail' request.user.username %}">
+                {% if request.user.profile.picture %}
+                    <img src="{{ request.user.profile.picture.url }}" height="35" class="d-inline-block align-top rounded-circle"/>
+                {% else%}
+                    <img src="{% static 'img/default-profile.png' %}" height="35" class="d-inline-block align-top rounded-circle"/>
+                {% endif %}
+            </a>
+        </li>
+
+        <li class="nav-item nav-icon">
+            <a href="{% url "posts:create" %}">
+                <i class="fas fa-plus"></i>
+            </a>
+        </li>
+
+        <li class="nav-item nav-icon">
+          <a href="{% url "users:logout" %}">
+            <i class="fas fa-sign-out-alt"></i>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+```
+
+Ahora modificaremos la vista de listar los **posts** por una vista de clase.
+
+```python
+# posts/views.py
+"""
+Posts Views
+"""
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+
+# Models
+from posts.models import Post
+
+# Forms
+from posts.forms import PostForm
+
+# Create your views here.
+
+
+class PostsFeedView(LoginRequiredMixin, ListView):
+    """Return all published posts."""
+
+    # Enviamos em template
+    template_name = 'posts/feed.html'
+    # El modelo que listaremos
+    model = Post
+    # El orden
+    ordering = ('-created',)
+    # Paginamos
+    paginate_by = 2
+    # Enviamos el objeto al html como posts
+    context_object_name = 'posts'
+
+
+....
+
+```
+
+Debemos modificar la **urls** para  listar los posts, ya que, recibirá una vista basada en clase.
+
+```python
+# posts/urls.py
+
+"""Posts URLs."""
+
+# Django
+from django.urls import path
+
+# Views
+from posts import views
+
+urlpatterns = [
+
+    path(
+        route='',
+        view=views.PostsFeedView.as_view(),
+        name='feed'
+    ),
+
+    path(
+        route='posts/new/',
+        view=views.create_post,
+        name='create'
+    ),
+]
+```
+
+
 
 # Glosario
 
