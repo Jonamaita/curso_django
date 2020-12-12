@@ -83,6 +83,12 @@ class UpdateProfileView(LoginRequiredMixin, UpdateView):
         return reverse("users:detail", kwargs={"username": username})
 
 
+class LogoutView(LoginRequiredMixin, auth_views.LogoutView):
+    """Logout view."""
+
+    template_name = 'users/logged_out.html'
+
+
 class SignupView(FormView):
     """
     Signup View.
