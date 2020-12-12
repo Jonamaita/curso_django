@@ -3,13 +3,14 @@ User Views
 """
 
 # Django
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import views as auth_views
 # Models
 from django.contrib.auth.models import User
 # Redirect nos ayudara a redireccionarnos a otro path
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, FormView, UpdateView
 
@@ -53,6 +54,15 @@ class UserDetailView(LoginRequiredMixin, DetailView):
         # Agregamos contexto posts
         context["posts"] = Post.objects.filter(user=user).order_by("-created")
         return context
+
+
+class LoginView(auth_views.LoginView):
+    """Login view."""
+
+    template_name = 'users/login.html'
+    # Si un usuario loguenado entra en login, lo redirige a la url de la
+    # variable LOGIN_REDIRECT_URL definida en settings
+    redirect_authenticated_user = True
 
 
 # Creamos la funcion logout_view, y lo decoramos con
