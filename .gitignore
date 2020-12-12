@@ -154,4 +154,5 @@ dmypy.json
 .vscode
 # Migrations
 migrations
+*.zip
 # End of https://www.toptal.com/developers/gitignore/api/django
