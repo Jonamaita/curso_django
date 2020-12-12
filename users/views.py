@@ -3,14 +3,11 @@ User Views
 """
 
 # Django
-from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import views as auth_views
 # Models
 from django.contrib.auth.models import User
 # Redirect nos ayudara a redireccionarnos a otro path
-from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, FormView, UpdateView
 
@@ -63,19 +60,6 @@ class LoginView(auth_views.LoginView):
     # Si un usuario loguenado entra en login, lo redirige a la url de la
     # variable LOGIN_REDIRECT_URL definida en settings
     redirect_authenticated_user = True
-
-
-# Creamos la funcion logout_view, y lo decoramos con
-# login_required, asi solo se ejecutara si existe una sesión.
-@login_required
-def logout_view(request):
-    """
-    logout view
-    """
-
-    # Ejecutamos logout, el cual borrara los tokens del navegador.
-    logout(request)
-    return redirect("users:login")  # Redirigimos a path de login.
 
 
 class UpdateProfileView(LoginRequiredMixin, UpdateView):
